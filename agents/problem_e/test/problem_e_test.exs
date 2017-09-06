@@ -9,6 +9,7 @@ defmodule ProblemETest do
     assert ProblemE.pop(:counter) == 1
   end
 
+  @tag :focus
   test "explicitly start GenServer, pop, increment and then pop to check that the counter has been incremented" do
     ProblemE.start_link
     assert ProblemE.pop(:counter) == 0

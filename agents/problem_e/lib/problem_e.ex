@@ -6,11 +6,20 @@ defmodule ProblemE do
 
 
   def pop(key) do
-    GenServer.call(__MODULE__, {:pop, key})
+    case GenServer.whereis(__MODULE__) do
+      nil -> 0
+      _   -> GenServer.call(__MODULE__, {:pop, key})
+    end
   end
 
   def incr(key) do
-    GenServer.call(__MODULE__, {:incr, key})
+    case GenServer.whereis(__MODULE__) do
+      nil ->
+        start_link()
+        incr(key)
+      _ ->
+        GenServer.call(__MODULE__, {:incr, key})
+    end
   end
 
   # only change code above
