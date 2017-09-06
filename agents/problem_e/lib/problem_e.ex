@@ -6,19 +6,22 @@ defmodule ProblemE do
 
 
   def pop(key) do
-    case GenServer.whereis(__MODULE__) do
-      nil -> 0
-      _   -> GenServer.call(__MODULE__, {:pop, key})
-    end
+    ensure_started fn -> GenServer.call(__MODULE__, {:pop, key}) end
   end
 
   def incr(key) do
-    case GenServer.whereis(__MODULE__) do
-      nil ->
-        start_link()
-        incr(key)
-      _ ->
-        GenServer.call(__MODULE__, {:incr, key})
+    ensure_started fn -> GenServer.call(__MODULE__, {:incr, key}) end
+  end
+
+  def ensure_started(fun) do
+    try do
+      fun.()
+    catch
+      :exit, {noproc, _} when noproc in [:noproc, :normal] ->
+        case start_link() do
+          {:ok, _} -> ensure_started(fun)
+          {:error, {:already_started, _}} -> ensure_started(fun)
+        end
     end
   end
 
