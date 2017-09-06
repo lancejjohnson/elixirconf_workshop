@@ -9,7 +9,7 @@ defmodule ProblemD do
   Start the Agents.
   """
   def start_link() do
-    strategy = :one_for_one
+    strategy = :one_for_all
 
     ## Do not change code below
 
@@ -36,8 +36,8 @@ defmodule ProblemD do
 
     defp init() do
       ref = make_ref()
-      Agent.update(:alice, fn(map) ->
-        Map.update(map, :ref, ref, fn(val) -> raise "ref is #{inspect val}" end)
+      Agent.update(:alice, fn(agent_state) ->
+        Map.update(agent_state, :ref, ref, fn(val) -> raise "ref is #{inspect val}" end)
       end)
       ref
     end
