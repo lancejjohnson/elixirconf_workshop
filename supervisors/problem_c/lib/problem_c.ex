@@ -10,13 +10,8 @@ defmodule ProblemC do
   """
 
   def start_link() do
-    GenServer.start_link(__MODULE__, nil)
-  end
-
-  def init(_) do
-    {:ok, _} = Person.start_link(:alice)
-    {:ok, _} = Person.start_link(:bob)
-    {:ok, nil}
+    children = Enum.map [:alice, :bob], &Person.child_spec/1
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 
   ## Do not change code below
