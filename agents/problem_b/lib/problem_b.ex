@@ -29,14 +29,9 @@ defmodule ProblemB do
 
   @doc false
   def handle_call({:fetch!, key}, _, state) do
-    result = try do
-      Map.fetch!(state, key)
-    rescue
-      err in [KeyError] -> {:error, err}
-    else
-      value -> {:ok, value}
+    case state do
+      %{^key => value} -> {:reply, {:ok, value}, state}
+      _                -> {:reply, {:error, %KeyError{key: key, term: state}}, state}
     end
-
-    {:reply, result, state}
   end
 end
