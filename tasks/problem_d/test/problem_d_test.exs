@@ -4,6 +4,7 @@ defmodule ProblemDTest do
 
   test "async uses a monitor" do
     %ProblemD{ref: ref} = ProblemD.async(fn() -> 1 + 1 end)
+
     assert_receive {^ref, 2}
     assert_receive {:DOWN, ^ref, :process, _, :normal}
   end
@@ -30,14 +31,17 @@ defmodule ProblemDTest do
     refute_received {:DOWN, ^ref, _, _, _}
   end
 
+  @tag :focus
   @tag :capture_log
   test "await exits on exception" do
     Process.flag(:trap_exit, true)
 
     task = ProblemD.async(fn() -> raise "oops" end)
-    assert {{%RuntimeError{message: "oops"}, [_|_]},
-            {ProblemD, :await, [^task, 123]}} =
-      catch_exit(ProblemD.await(task, 123))
+
+    assert {
+      {%RuntimeError{message: "oops"}, [_|_]},
+      {ProblemD, :await, [^task, 123]}
+    } = catch_exit(ProblemD.await(task, 123))
   end
 
   test "await exits on timeout" do
