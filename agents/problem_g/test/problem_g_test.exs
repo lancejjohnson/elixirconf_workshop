@@ -2,6 +2,7 @@ defmodule ProblemGTest do
   use ExUnit.Case
   doctest ProblemG
 
+  @tag :focus
   test "ping replies with pong" do
     {:ok, pid} = ProblemG.start_link()
     assert ProblemG.call(pid, :ping, 5000) == :pong
